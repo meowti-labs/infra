@@ -1,0 +1,22 @@
+# secrets
+.env
+*.pem
+*.key
+/secrets/
+**/.env
+
+# minecraft runtime data (절대 커밋 금지)
+**/data/
+**/world*/
+**/logs/
+
+# artifacts/downloads (배포 산출물은 웹 루트에만)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.zst
+**/instances/
+
+# OS / tools
+.DS_Store
