@@ -1,0 +1,16 @@
+services:
+  nginx:
+    image: nginx:stable
+    container_name: infra-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - /srv/web/dl.meowti.kr/files:/srv/web/dl.meowti.kr/files:ro
+      - /srv/infra/nginx/conf.d:/etc/nginx/conf.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
