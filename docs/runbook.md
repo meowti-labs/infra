@@ -23,6 +23,8 @@ curl -I https://dl.meowti.kr/instance.zip
 ## 2) dl 배포 (Story #3)
 
 업로드된 zip을 버전 파일로 보관하고 latest 링크를 교체:
+- `/srv/shared/downloads/instance.zip`는 업로드 원본(입력) 경로입니다.
+- `/srv/web/dl.meowti.kr/files/instances/...`는 스크립트가 생성/갱신하는 배포 결과(서빙) 경로입니다.
 ```bash
 cd /srv/infra
 ./scripts/deploy-instance.sh /srv/shared/downloads/instance.zip
