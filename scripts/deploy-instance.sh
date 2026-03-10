@@ -6,7 +6,6 @@ INST_DIR="$WEB_ROOT/instances"
 META_DIR="$WEB_ROOT/meta"
 LATEST_INSTANCE_LINK="$WEB_ROOT/instance.zip"
 LATEST_SHA_LINK="$WEB_ROOT/instance.sha256"
-ALIAS_COMPAT_LINK="$INST_DIR/instance.zip"
 
 usage() {
   cat <<USAGE
@@ -75,11 +74,9 @@ mv -f "$SHA_TMP" "$SHA_DEST" || fail "failed to move staging sha256 file"
 
 ln -sfn "$DEST" "$LATEST_INSTANCE_LINK" || fail "failed to update latest instance link"
 ln -sfn "$SHA_DEST" "$LATEST_SHA_LINK" || fail "failed to update latest sha256 link"
-ln -sfn "$DEST" "$ALIAS_COMPAT_LINK" || fail "failed to update alias-compat instance link"
 
 echo "OK:"
 echo "  version zip : $DEST"
 echo "  latest zip  : $LATEST_INSTANCE_LINK -> $(readlink -f "$LATEST_INSTANCE_LINK")"
-echo "  alias link  : $ALIAS_COMPAT_LINK -> $(readlink -f "$ALIAS_COMPAT_LINK")"
 echo "  version sha : $SHA_DEST"
 echo "  latest sha  : $LATEST_SHA_LINK -> $(readlink -f "$LATEST_SHA_LINK")"

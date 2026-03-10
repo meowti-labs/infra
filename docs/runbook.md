@@ -4,7 +4,7 @@
 
 사전 조건:
 - nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/dl.meowti.kr.conf`
-- 대상 파일 존재(최소): `/srv/web/dl.meowti.kr/files/instances/instance.zip`
+- 대상 파일 존재(최소): `/srv/web/dl.meowti.kr/files/instance.zip`
 
 점검 커맨드:
 ```bash
