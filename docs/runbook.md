@@ -46,7 +46,29 @@ curl -I https://dl.meowti.kr/instance.zip
 - `/srv/web/dl.meowti.kr/files/instance.sha256`이 최신 sha 파일을 가리킴
 - `cat instance.sha256`의 해시와 `sha256sum` 결과가 동일
 
-## 3) 트러블슈팅
+## 3) HTTPS/Redirect 검증 (Story #4)
+
+정책(역할 분리):
+- `http -> https` 리다이렉트 책임은 Cloudflare Edge가 가진다.
+- Origin nginx는 정적 파일 서빙만 담당하고, TLS 종단/리다이렉트 정책은 Cloudflare에서 운영한다.
+
+검증 커맨드:
+```bash
+curl -I http://dl.meowti.kr/instance.zip
+curl -I https://dl.meowti.kr/instance.zip
+```
+
+기대 결과:
+- HTTP 응답은 `301/302/308` + `Location: https://dl.meowti.kr/...`
+- HTTPS 응답은 `200 OK` (브라우저 인증서 경고 없음)
+- HSTS를 쓰기로 결정했다면 `strict-transport-security` 헤더가 존재
+
+실패 시 조치:
+- HTTP가 `200`이면 Cloudflare Redirect Rule 또는 Always Use HTTPS 설정을 재확인
+- 인증서 경고가 있으면 Cloudflare SSL/TLS 모드와 인증서 상태를 재확인
+- 원인 확인 후 결과를 본 문서에 날짜와 함께 갱신
+
+## 4) 트러블슈팅
 
 `ERR: input zip not found`:
 - 입력 경로 확인: `ls -l /srv/shared/downloads`
@@ -64,10 +86,10 @@ curl -I https://dl.meowti.kr/instance.zip
 - `docker logs --tail=200 infra-nginx`
 - `docker exec infra-nginx nginx -t`
 
-## 4) 운영자 확인 절차 (배포 직후)
+## 5) 운영자 확인 절차 (배포 직후)
 1. `deploy-instance.sh` 출력에서 version zip / latest 링크 경로를 확인한다.
 2. `instance.zip` 링크가 최신 버전 파일을 가리키는지 확인한다.
 3. `instance.sha256` 링크가 최신 sha 파일을 가리키는지 확인한다.
 4. `sha256sum`과 `cat instance.sha256` 값이 일치하는지 확인한다.
-5. 외부 URL `https://dl.meowti.kr/instance.zip`이 200인지 확인한다.
-6. 문제 시 트러블슈팅 섹션 순서대로 원인을 분류한다.
+5. `curl -I http://dl.meowti.kr/instance.zip`가 301/302/308인지 확인한다.
+6. `curl -I https://dl.meowti.kr/instance.zip`가 200인지 확인한다.
