@@ -79,7 +79,12 @@ ls -l /srv/shared/downloads/instance.zip
 cd /srv/infra
 ./scripts/deploy-instance.sh /srv/shared/downloads/instance.zip
 
-# 3) 1분 검증
+# 3) 1분 자동 검증 (권장)
+./scripts/check-deploy.sh
+```
+
+### 4-2. 수동 보조 검증 (스크립트 실패 시)
+```bash
 curl -I http://dl.meowti.kr/instance.zip
 curl -I https://dl.meowti.kr/instance.zip
 curl -I https://dl.meowti.kr/instance.sha256
@@ -89,7 +94,8 @@ sha256sum "$(readlink -f /srv/web/dl.meowti.kr/files/instance.zip)"
 cat /srv/web/dl.meowti.kr/files/instance.sha256
 ```
 
-### 4-2. 기대 결과
+### 4-3. 기대 결과
+- `./scripts/check-deploy.sh` 종료 코드가 `0`
 - HTTP -> `301/302/308` 리다이렉트
 - HTTPS `instance.zip` -> `200 OK`
 - HTTPS `instance.sha256` -> `200 OK`
@@ -97,7 +103,7 @@ cat /srv/web/dl.meowti.kr/files/instance.sha256
 - `instances/`에 신규 버전 파일 존재
 - `sha256sum` 결과와 `instance.sha256` 해시가 동일
 
-### 4-3. 실패 체크포인트(최소)
+### 4-4. 실패 체크포인트(최소)
 - 404: `readlink -f /srv/web/dl.meowti.kr/files/instance.zip` 경로와 파일 존재 확인
 - 403/권한: `namei -l /srv/web/dl.meowti.kr/files` 후 소유권/권한 점검
 - 리로드 누락: `docker exec infra-nginx nginx -t && docker exec infra-nginx nginx -s reload`
@@ -125,6 +131,6 @@ cat /srv/web/dl.meowti.kr/files/instance.sha256
 1. `deploy-instance.sh` 출력에서 version zip / latest 링크 경로를 확인한다.
 2. `instance.zip` 링크가 최신 버전 파일을 가리키는지 확인한다.
 3. `instance.sha256` 링크가 최신 sha 파일을 가리키는지 확인한다.
-4. `sha256sum`과 `cat instance.sha256` 값이 일치하는지 확인한다.
-5. `curl -I http://dl.meowti.kr/instance.zip`가 301/302/308인지 확인한다.
-6. `curl -I https://dl.meowti.kr/instance.zip`가 200인지 확인한다.
+4. `./scripts/check-deploy.sh`를 실행해 자동 검증 결과를 확인한다.
+5. 자동 검증 실패 시 수동 보조 검증으로 항목별 원인을 분리한다.
+6. `curl -I https://dl.meowti.kr/instance.zip`가 200인지 최종 확인한다.
