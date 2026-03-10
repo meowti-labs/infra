@@ -68,7 +68,42 @@ curl -I https://dl.meowti.kr/instance.zip
 - 인증서 경고가 있으면 Cloudflare SSL/TLS 모드와 인증서 상태를 재확인
 - 원인 확인 후 결과를 본 문서에 날짜와 함께 갱신
 
-## 4) 트러블슈팅
+## 4) 배포 성공 1분 판정 (Story #5)
+
+### 4-1. 절차 (업로드 -> 스크립트 실행 -> 확인)
+```bash
+# 1) 업로드 파일 준비
+ls -l /srv/shared/downloads/instance.zip
+
+# 2) 배포 실행
+cd /srv/infra
+./scripts/deploy-instance.sh /srv/shared/downloads/instance.zip
+
+# 3) 1분 검증
+curl -I http://dl.meowti.kr/instance.zip
+curl -I https://dl.meowti.kr/instance.zip
+curl -I https://dl.meowti.kr/instance.sha256
+ls -l /srv/web/dl.meowti.kr/files/instance.zip
+ls -l /srv/web/dl.meowti.kr/files/instances | tail -n 5
+sha256sum "$(readlink -f /srv/web/dl.meowti.kr/files/instance.zip)"
+cat /srv/web/dl.meowti.kr/files/instance.sha256
+```
+
+### 4-2. 기대 결과
+- HTTP -> `301/302/308` 리다이렉트
+- HTTPS `instance.zip` -> `200 OK`
+- HTTPS `instance.sha256` -> `200 OK`
+- latest 링크(`/instance.zip`)가 최신 버전 파일을 가리킴
+- `instances/`에 신규 버전 파일 존재
+- `sha256sum` 결과와 `instance.sha256` 해시가 동일
+
+### 4-3. 실패 체크포인트(최소)
+- 404: `readlink -f /srv/web/dl.meowti.kr/files/instance.zip` 경로와 파일 존재 확인
+- 403/권한: `namei -l /srv/web/dl.meowti.kr/files` 후 소유권/권한 점검
+- 리로드 누락: `docker exec infra-nginx nginx -t && docker exec infra-nginx nginx -s reload`
+- 무결성 실패: `sha256sum` 결과와 `cat instance.sha256` 비교 후 불일치 시 재배포
+
+## 5) 트러블슈팅
 
 `ERR: input zip not found`:
 - 입력 경로 확인: `ls -l /srv/shared/downloads`
@@ -86,7 +121,7 @@ curl -I https://dl.meowti.kr/instance.zip
 - `docker logs --tail=200 infra-nginx`
 - `docker exec infra-nginx nginx -t`
 
-## 5) 운영자 확인 절차 (배포 직후)
+## 6) 운영자 확인 절차 (배포 직후)
 1. `deploy-instance.sh` 출력에서 version zip / latest 링크 경로를 확인한다.
 2. `instance.zip` 링크가 최신 버전 파일을 가리키는지 확인한다.
 3. `instance.sha256` 링크가 최신 sha 파일을 가리키는지 확인한다.
