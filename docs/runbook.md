@@ -187,3 +187,30 @@ docker logs --tail=100 infra-nginx
 - `502` 발생 시 API 업스트림(`api:8080`) 컨테이너 기동 및 네트워크 연결 확인
 - `api` 이름 해석 실패 시 컨테이너가 `frontdoor-net`에 조인되었는지 확인 후 nginx 재기동
 - 경로 미매칭 시 `server_name api.meowti.kr` 및 `proxy_pass` 설정 확인
+
+## 8) dashboard 프록시 점검 (Story #17)
+
+사전 조건:
+- nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/dashboard.meowti.kr.conf`
+- dashboard(Next.js) 컨테이너가 `frontdoor-net`에서 `dashboard:3000`으로 동작한다.
+
+자동 검증(권장):
+```bash
+cd /srv/infra
+./scripts/check-dashboard-proxy.sh
+```
+
+수동 보조 검증:
+```bash
+curl -I -H 'Host: dashboard.meowti.kr' http://127.0.0.1/
+docker logs --tail=100 infra-nginx
+```
+
+기대 결과:
+- `/` -> `200 OK`
+- nginx 로그에서 upstream 연결 오류가 없어야 함
+
+실패 시 조치:
+- `502` 발생 시 dashboard 업스트림(`dashboard:3000`) 컨테이너 기동 및 네트워크 연결 확인
+- `dashboard` 이름 해석 실패 시 컨테이너가 `frontdoor-net`에 조인되었는지 확인 후 nginx 재기동
+- 경로 미매칭 시 `server_name dashboard.meowti.kr` 및 `proxy_pass` 설정 확인
