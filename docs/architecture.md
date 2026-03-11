@@ -7,13 +7,14 @@
 | `/srv/infra` | 인프라 정의(compose/nginx/scripts/docs) | 허용 |
 | `/srv/mc/sunlit-valley` | Minecraft 런타임(world/logs/config/runtime) | 금지 |
 | `/srv/shared/downloads` | 외부 반입 파일(예: 업로드된 zip) | 금지 |
-| `/srv/shared/secrets` | 시크릿(.env, key, token) | 금지 |
+| `/srv/secrets` | 시크릿(.env, key, token) | 금지 |
 | `/srv/web/dl.meowti.kr/files` | 다운로드 배포물 루트(instance.zip, instances/, meta/) | 금지 |
 | `/srv/web` 하위 앱 런타임 | dashboard/api 런타임 산출물 | 금지 |
 
 기본 원칙:
 - 런타임 데이터는 `/srv`에 두고, 레포에는 운영 정의만 유지합니다.
-- `.env.example`만 커밋하고 실제 값은 `/srv/shared/secrets`에서 주입합니다.
+- `.env.example`만 커밋하고 실제 값은 `/srv/secrets`에서 주입합니다.
+- 레거시 호환을 위해 `/srv/shared/secrets`는 `/srv/secrets` 심볼릭 링크로만 유지합니다.
 - 대용량 배포물(zip, world)은 Git이 아니라 파일 경로/배포 스크립트로 운영합니다.
 
 ## 2) Front Door / 도메인 정책
