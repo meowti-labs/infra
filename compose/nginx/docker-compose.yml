@@ -8,9 +8,15 @@ services:
     volumes:
       - /srv/web/dl.meowti.kr/files:/srv/web/dl.meowti.kr/files:ro
       - /srv/infra/nginx/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      - frontdoor
     healthcheck:
       test: ["CMD-SHELL", "nginx -t >/dev/null 2>&1 || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+networks:
+  frontdoor:
+    name: frontdoor-net

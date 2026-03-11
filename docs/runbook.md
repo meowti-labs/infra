@@ -158,3 +158,32 @@ cat /srv/web/dl.meowti.kr/files/instance.sha256
 4. `sha256sum`과 `cat instance.sha256` 값이 일치하는지 확인한다.
 5. `curl -I http://dl.meowti.kr/instance.zip`가 301/302/308인지 확인한다.
 6. `curl -I https://dl.meowti.kr/instance.zip`가 200인지 확인한다.
+
+## 7) api 프록시 점검 (Story #18)
+
+사전 조건:
+- nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/api.meowti.kr.conf`
+- nginx 컨테이너가 `frontdoor-net` 네트워크에 연결되어 있다.
+- API(Spring Boot) 컨테이너가 `frontdoor-net`에서 `api:8080`으로 동작하며 `/healthz`를 `200`으로 반환한다.
+
+자동 검증(권장):
+```bash
+cd /srv/infra
+./scripts/check-api-proxy.sh
+```
+
+수동 보조 검증:
+```bash
+curl -I -H 'Host: api.meowti.kr' http://127.0.0.1/healthz
+curl -I -H 'Host: api.meowti.kr' http://127.0.0.1/
+docker logs --tail=100 infra-nginx
+```
+
+기대 결과:
+- `/healthz` -> `200 OK`
+- nginx 로그에서 upstream 연결 오류가 없어야 함
+
+실패 시 조치:
+- `502` 발생 시 API 업스트림(`api:8080`) 컨테이너 기동 및 네트워크 연결 확인
+- `api` 이름 해석 실패 시 컨테이너가 `frontdoor-net`에 조인되었는지 확인 후 nginx 재기동
+- 경로 미매칭 시 `server_name api.meowti.kr` 및 `proxy_pass` 설정 확인
