@@ -22,8 +22,15 @@ docker compose -f compose/nginx/docker-compose.yml ps
 ./scripts/check-nginx-autostart.sh
 ```
 
+## 1) dl 정적 서비스 점검 (Story #2, #16)
 
-## 1) dl 정적 서비스 점검 (Story #2)
+자동 검증(권장):
+```bash
+cd /srv/infra
+./scripts/check-dl-static.sh
+```
+
+수동 보조 검증:
 
 사전 조건:
 - nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/dl.meowti.kr.conf`
