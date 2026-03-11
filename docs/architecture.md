@@ -14,7 +14,6 @@
 기본 원칙:
 - 런타임 데이터는 `/srv`에 두고, 레포에는 운영 정의만 유지합니다.
 - `.env.example`만 커밋하고 실제 값은 `/srv/secrets`에서 주입합니다.
-- 레거시 호환을 위해 `/srv/shared/secrets`는 `/srv/secrets` 심볼릭 링크로만 유지합니다.
 - 대용량 배포물(zip, world)은 Git이 아니라 파일 경로/배포 스크립트로 운영합니다.
 
 ## 2) Front Door / 도메인 정책
