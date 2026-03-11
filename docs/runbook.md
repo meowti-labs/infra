@@ -190,6 +190,13 @@ docker logs --tail=100 infra-nginx
 
 ## 8) dashboard 프록시 점검 (Story #17)
 
+배포(신규/갱신):
+```bash
+cd /srv/infra
+docker compose -f compose/dashboard/docker-compose.yml up -d --build
+docker compose -f compose/dashboard/docker-compose.yml ps
+```
+
 사전 조건:
 - nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/dashboard.meowti.kr.conf`
 - dashboard(Next.js) 컨테이너가 `frontdoor-net`에서 `dashboard:3000`으로 동작한다.
