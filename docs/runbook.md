@@ -1,5 +1,28 @@
 # Runbook
 
+## 0) nginx 자동 기동 기준 점검 (Story #15)
+
+기본 검증(권장):
+```bash
+cd /srv/infra
+./scripts/check-nginx-autostart.sh
+```
+
+기대 결과:
+- restart policy: `unless-stopped`
+- 컨테이너 상태: `running` + `healthy`
+- `GET /healthz`(Host: dl.meowti.kr): `200 OK`
+
+재부팅 검증 절차(운영 점검 시):
+```bash
+sudo reboot
+# SSH 재접속 후
+cd /srv/infra
+docker compose -f compose/nginx/docker-compose.yml ps
+./scripts/check-nginx-autostart.sh
+```
+
+
 ## 1) dl 정적 서비스 점검 (Story #2)
 
 사전 조건:
