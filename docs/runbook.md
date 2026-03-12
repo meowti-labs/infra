@@ -53,11 +53,12 @@ curl -I https://dl.meowti.kr/instance.zip
 ## 2) dl 배포 (Story #3)
 
 업로드된 zip을 버전 파일로 보관하고 latest 링크를 교체:
-- `/srv/shared/downloads/instance.zip`는 업로드 원본(입력) 경로입니다.
+- `/srv/shared/archives/instance.zip`는 업로드 원본(입력) 경로입니다.
+- 레거시 호환: `/srv/shared/downloads`는 `/srv/shared/archives` 심볼릭 링크입니다.
 - `/srv/web/dl.meowti.kr/files/instances/...`는 스크립트가 생성/갱신하는 배포 결과(서빙) 경로입니다.
 ```bash
 cd /srv/infra
-./scripts/deploy-instance.sh /srv/shared/downloads/instance.zip
+./scripts/deploy-instance.sh /srv/shared/archives/instance.zip
 ```
 
 배포 직후 검증(1분 내):
@@ -103,11 +104,11 @@ curl -I https://dl.meowti.kr/instance.zip
 ### 4-1. 절차 (업로드 -> 스크립트 실행 -> 확인)
 ```bash
 # 1) 업로드 파일 준비
-ls -l /srv/shared/downloads/instance.zip
+ls -l /srv/shared/archives/instance.zip
 
 # 2) 배포 실행
 cd /srv/infra
-./scripts/deploy-instance.sh /srv/shared/downloads/instance.zip
+./scripts/deploy-instance.sh /srv/shared/archives/instance.zip
 
 # 3) 1분 검증
 curl -I http://dl.meowti.kr/instance.zip
@@ -136,7 +137,7 @@ cat /srv/web/dl.meowti.kr/files/instance.sha256
 ## 5) 트러블슈팅
 
 `ERR: input zip not found`:
-- 입력 경로 확인: `ls -l /srv/shared/downloads`
+- 입력 경로 확인: `ls -l /srv/shared/archives`
 
 `ERR: directory is not writable`:
 - 권한 확인: `namei -l /srv/web/dl.meowti.kr/files`
@@ -200,6 +201,7 @@ docker compose -f compose/dashboard/docker-compose.yml ps
 사전 조건:
 - nginx 설정 파일 존재: `/srv/infra/nginx/conf.d/dashboard.meowti.kr.conf`
 - dashboard(Next.js) 컨테이너가 `frontdoor-net`에서 `dashboard:3000`으로 동작한다.
+- dashboard 소스 경로: `/srv/web/mc-dashboard` (infra 레포 외부 애플리케이션 계층).
 
 자동 검증(권장):
 ```bash

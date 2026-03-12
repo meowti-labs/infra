@@ -1,7 +1,7 @@
 services:
   dashboard:
     build:
-      context: /srv/infra/apps/dashboard
+      context: /srv/web/mc-dashboard
       dockerfile: Dockerfile
     container_name: dashboard-web
     restart: unless-stopped
